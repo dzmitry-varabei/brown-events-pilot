@@ -236,6 +236,7 @@ The team is consolidating on a TypeScript stack. Reimplement the backend in **Ty
 - [ ] Multi-step writes are atomic (`$transaction`), with a brief comment explaining what state would be corrupted otherwise
 - [ ] Defects from your BEVN-003 audit are fixed, not ported — the PR description lists each one and how the new code avoids it
 - [ ] Existing backend unit tests ported to the new stack (Jest or Vitest) and passing
+- [ ] API documentation from BEVN-002 survives the migration (e.g. `@nestjs/swagger`) — `/swagger` works on the new backend
 - [ ] No N+1 queries: list endpoints execute a bounded number of queries regardless of record count
 - [ ] The CI workflow from EXT-110 is updated to build and test the new backend
 - [ ] `docker-compose up --build` brings up the app with the new backend; README updated with new run instructions
