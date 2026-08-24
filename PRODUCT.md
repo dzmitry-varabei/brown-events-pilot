@@ -5,8 +5,9 @@
 > Read this document before starting any task. Set up the project with
 > `docker-compose up` and explore it before picking up a task.
 >
-> **This is a trimmed, ordered route of 9 tasks** (the full task library is larger).
-> Work through them **in order** — each task builds on the ones before it.
+> **This is a trimmed, ordered route in two tracks — .NET (9 tasks) and TypeScript (7 tasks)**
+> (the full task library is larger). Pick your track, then work through its tasks
+> **in order** — each task builds on the ones before it.
 > The rules of the pilot (branches, PRs, process, report) are in [ASSIGNMENT.md](ASSIGNMENT.md).
 
 ---
@@ -17,9 +18,11 @@
 - [Domain Entities](#domain-entities)
 - [The Route](#the-route)
 - [Tasks](#tasks)
-  - [Phase 0 — Discovery](#phase-0--discovery)
-  - [Phase 1 — Stabilize the Registration Flow](#phase-1--stabilize-the-registration-flow)
-  - [Phase 2 — New Features](#phase-2--new-features)
+  - [Phase 0 — Discovery (both tracks)](#phase-0--discovery-both-tracks)
+  - [Phase 1A — Stabilize the Registration Flow (Track A)](#phase-1a--stabilize-the-registration-flow-track-a)
+  - [Phase 1B — Migrate to TypeScript (Track B)](#phase-1b--migrate-to-typescript-track-b)
+  - [Frontend Fix (both tracks)](#frontend-fix-both-tracks)
+  - [Phase 2 — New Features (both tracks)](#phase-2--new-features-both-tracks)
 
 ---
 
@@ -48,7 +51,9 @@ The stack is **ASP.NET Core 6 + EF Core 6 + React + Vite + PostgreSQL**. Run `do
 
 ## The Route
 
-You work **individually**, tasks strictly in order:
+You work **individually**, tasks strictly in order. There are **two tracks** — pick one based on the backend stack you know well (you must be able to judge the agent's output, not just apply it):
+
+**Track A — .NET.** Stabilize the existing backend, then build features on it.
 
 | # | Task | Theme | Process |
 |---|------|-------|---------|
@@ -62,7 +67,19 @@ You work **individually**, tasks strictly in order:
 | 8 | BEVN-202 | Session Waitlist | **spec-driven (superpowers)** |
 | 9 | BEVN-203 | Attendee Registration Dashboard | **spec-driven (superpowers)** |
 
-The route is one vertical slice: understand the codebase (Phase 0), stabilize the registration flow (Phase 1), then build two features on top of it (Phase 2). Skipping ahead makes later tasks harder — the Phase 2 features rely on clean error handling (BEVN-104), validation (BEVN-107) and atomic writes (BEVN-109).
+**Track B — TypeScript.** Same discovery, then migrate the backend to TypeScript instead of stabilizing the .NET one — fixing its known defects in the process — and build the same features on the migrated backend.
+
+| # | Task | Theme | Process |
+|---|------|-------|---------|
+| 1 | BEVN-001 | Codebase mapping | free-form |
+| 2 | BEVN-002 | API documentation | free-form |
+| 3 | BEVN-003 | Technical debt audit | free-form |
+| 4 | BEVN-150 | Migrate backend to TypeScript (NestJS) | **spec-driven (superpowers)** |
+| 5 | BEVN-115 | Registration modal stale state | free-form |
+| 6 | BEVN-202 | Session Waitlist | **spec-driven (superpowers)** |
+| 7 | BEVN-203 | Attendee Registration Dashboard | **spec-driven (superpowers)** |
+
+Both routes are one vertical slice: understand the codebase (Phase 0), get the registration flow into shape (Phase 1: fix it in place, or migrate it cleanly), then build two features on top of it (Phase 2). Skipping ahead makes later tasks harder — the Phase 2 features rely on clean error handling, validation and atomic writes, whichever way you got them.
 
 "Free-form" means: work with your agent however you like. "Spec-driven" means: spec and plan are written and reviewed **before** the code — see [ASSIGNMENT.md](ASSIGNMENT.md).
 
@@ -72,9 +89,9 @@ The route is one vertical slice: understand the codebase (Phase 0), stabilize th
 
 ---
 
-## Phase 0 — Discovery
+## Phase 0 — Discovery (both tracks)
 
-> Goal: understand the codebase well enough to work in it safely. Output is documentation, not code.
+> Goal: understand the codebase well enough to work in it safely. Output is documentation, not code. These three tasks are identical for both tracks — discovery doesn't depend on the stack you'll continue in.
 
 ### BEVN-001 — Codebase Mapping
 Explore the backend codebase and produce a written map of what exists. Document the project structure, the responsibility of each layer (Controllers, Services, Models, Data), and the relationships between entities. Draw an entity-relationship diagram. Identify the request flow from HTTP call to database and back. At the end, a new team member should be able to understand the architecture from your document without reading the code.
@@ -110,9 +127,9 @@ Read the codebase thoroughly — both backend and frontend — and produce a str
 
 ---
 
-## Phase 1 — Stabilize the Registration Flow
+## Phase 1A — Stabilize the Registration Flow (Track A)
 
-> Build from plain requirements — no spec-driven flow required. These four fixes prepare the ground for the Phase 2 features.
+> Track A only. Build from plain requirements — no spec-driven flow required. These three fixes prepare the ground for the Phase 2 features.
 
 ### BEVN-104 — Standardize API Responses and Error Handling
 The frontend team keeps running into surprises when consuming the API — different endpoints return data in different shapes, and when something breaks, the full ASP.NET error page (or raw stack trace) comes back. Fix this so the API is predictable for any caller.
@@ -147,6 +164,31 @@ The registration flow saves an attendee and then saves a registration in two sep
 
 ---
 
+## Phase 1B — Migrate to TypeScript (Track B)
+
+> Track B only, replaces Phase 1A. **Spec-driven flow is mandatory:** a migration without a plan burns days — write the spec and plan first (see [ASSIGNMENT.md](ASSIGNMENT.md)).
+
+### BEVN-150 — Migrate the Backend to TypeScript (NestJS)
+The team is consolidating on a TypeScript stack. Reimplement the backend in **TypeScript with NestJS and Prisma** (PostgreSQL stays), preserving the existing API surface so the React frontend keeps working unchanged. This is a *clean* migration: the defects you documented in BEVN-003 must be **fixed in the new backend, not ported**. NestJS maps almost one-to-one onto the ASP.NET Core structure — controllers, services, DI — so use the existing code as the source of truth for behavior, not as a style guide.
+
+**Definition of Done:**
+- [ ] Backend reimplemented in TypeScript: NestJS + Prisma, PostgreSQL unchanged
+- [ ] Same API surface: every existing endpoint keeps its path, method and response data — the frontend works against the new backend without changes
+- [ ] Demo data seeding preserved (equivalent of `DataSeeder`)
+- [ ] All endpoints return responses in the same structure; errors are structured JSON with appropriate status codes — never a raw stack trace
+- [ ] `POST` endpoints return `201 Created` with the created resource
+- [ ] Input validated with `class-validator` + `ValidationPipe`; invalid input returns `400 Bad Request` listing which fields failed and why
+- [ ] Multi-step writes are atomic (`$transaction`), with a brief comment explaining what state would be corrupted otherwise
+- [ ] Defects from your BEVN-003 audit are fixed, not ported — the PR description lists each one and how the new code avoids it
+- [ ] Existing backend unit tests ported to the new stack (Jest or Vitest) and passing
+- [ ] `docker-compose up --build` brings up the app with the new backend; README updated with new run instructions
+
+---
+
+## Frontend Fix (both tracks)
+
+> The frontend is React on both tracks — this task is identical for everyone. Free-form process.
+
 ### BEVN-115 — Registration Modal Shows Stale Data After Close
 When a user opens the registration modal, partially fills in the form, and then closes it, the fields still contain the old data the next time the modal is opened. After a successful registration, reopening the modal shows the success screen instead of a fresh form — making it impossible to start a new registration without refreshing the page.
 
@@ -158,9 +200,9 @@ When a user opens the registration modal, partially fills in the form, and then 
 
 ---
 
-## Phase 2 — New Features
+## Phase 2 — New Features (both tracks)
 
-> **Spec-driven flow is mandatory here.** Before writing any code: produce a spec (what exactly will be built, edge cases resolved) and a plan (how, step by step), review them yourself, and commit both alongside the code in the PR. Recommended tooling: the [superpowers](https://github.com/obra/superpowers) workflow (brainstorming → spec → plan → implementation). Details in [ASSIGNMENT.md](ASSIGNMENT.md).
+> Track A builds these on the stabilized .NET backend; Track B builds them on the migrated TypeScript backend. The requirements are identical. **Spec-driven flow is mandatory here.** Before writing any code: produce a spec (what exactly will be built, edge cases resolved) and a plan (how, step by step), review them yourself, and commit both alongside the code in the PR. Recommended tooling: the [superpowers](https://github.com/obra/superpowers) workflow (brainstorming → spec → plan → implementation). Details in [ASSIGNMENT.md](ASSIGNMENT.md).
 
 ### BEVN-202 — Session Waitlist
 When a session has reached its capacity, an attendee can join a waitlist. If a registered attendee cancels, the first person on the waitlist is automatically promoted to a confirmed registration. This promotion should be logged. The session detail page shows current registration count, capacity, and waitlist count.
