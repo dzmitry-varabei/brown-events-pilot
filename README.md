@@ -1,5 +1,7 @@
 # BrownEvents (.NET)
 
+> **Участникам пилота:** начните с [ASSIGNMENT.md](ASSIGNMENT.md) — там правила задания. Список тасок — в [PRODUCT.md](PRODUCT.md).
+
 Conference management application — the .NET version of the BrownEvents brownfield reference project.
 
 **Stack:** ASP.NET Core 6 · EF Core 6 · PostgreSQL 14 · React 18 · Vite
