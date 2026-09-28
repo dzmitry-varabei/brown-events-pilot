@@ -24,6 +24,11 @@ docker-compose up --build
 
 The backend seeds demo data (3 conferences, 7 sessions, 3 speakers) on first startup.
 
+> **macOS: port 5000 is taken by AirPlay Receiver.** If the page says *Failed to load conferences*
+> and `curl -i localhost:5000/api/conferences` answers `403` with `Server: AirTunes`, that is not the
+> backend — it is macOS. Turn off **System Settings → General → AirDrop & Handoff → AirPlay Receiver**
+> and reload the page. (Why the frontend depends on this port at all is worth a look during the audit.)
+
 ---
 
 ## Development Setup
