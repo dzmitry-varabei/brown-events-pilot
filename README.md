@@ -1,6 +1,6 @@
 # BrownEvents (.NET)
 
-> **Тестовое задание:** правила, маршрут тасок и сайд-квесты — в репозитории
+> **Тестовое задание и курс:** режимы, задания и правила сдачи — в репозитории
 > [rolling-scopes-school/ai-native](https://github.com/rolling-scopes-school/ai-native/tree/main/test-task).
 > Здесь — только код.
 
@@ -56,6 +56,28 @@ npm run dev   # proxies /api to localhost:5000
 
 ---
 
+## Tests
+
+| Level | Where | Command |
+|-------|-------|---------|
+| Backend unit (xUnit) | `backend/BrownEvents.Tests` | `cd backend && dotnet test BrownEvents.Tests` |
+| Frontend component (Vitest + Testing Library) | `frontend/src/**/*.test.jsx` | `cd frontend && npm test` |
+| End-to-end smoke (Playwright) | `e2e/tests` | see below |
+
+The e2e smoke test runs against the live stack:
+
+```bash
+docker-compose up --build -d          # start the stack first
+cd e2e
+npm install
+npx playwright install chromium       # once, downloads the browser
+npm test
+```
+
+Set `E2E_BASE_URL` if the frontend is not on `http://localhost:5173`.
+
+---
+
 ## Project Structure
 
 ```
@@ -72,4 +94,6 @@ frontend/
     pages/                  ← React page components
     components/             ← shared UI components
     api.js                  ← HTTP client
+
+e2e/                        ← Playwright end-to-end tests
 ```
